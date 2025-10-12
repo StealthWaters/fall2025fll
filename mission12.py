@@ -10,7 +10,7 @@ async def main():
     await motor.run_for_degrees(port.A, -193, 360)
     # continue
 
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 93, -250, 250)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 94, -250, 250)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -220, 0, velocity=500)
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -95, -250, 250)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -400, 0, velocity=250)
