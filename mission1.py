@@ -5,6 +5,58 @@ motion_sensor.reset_yaw
 motion_sensor.get_yaw_face
 print("part 1")
 
+# ---------------- Orientation Helpers ----------------
+def _norm_angle(angle):
+    """Normalize angle to range [-180, 180]."""
+    while angle > 180:
+        angle -= 360
+    while angle < -180:
+        angle += 360
+    return angle
+
+def get_yaw():
+    """Return current yaw angle if available (SPIKE Prime Hub)."""
+    if hasattr(motion_sensor, "get_yaw_angle"):
+        return motion_sensor.get_yaw_angle()
+    if hasattr(motion_sensor, "get_yaw_face"):
+        return motion_sensor.get_yaw_face()
+    if hasattr(motion_sensor, "get_yaw"):
+        return motion_sensor.get_yaw()
+    return None
+
+async def turn_relative(degrees, speed=300, tolerance=2):
+    """Turn the robot by a relative yaw using the hub motion sensor.
+
+    degrees: desired change in heading (+ clockwise or counter‑clockwise depending on hub convention).
+    speed: motor speed magnitude for tank turn.
+    tolerance: acceptable yaw error to stop.
+
+    Strategy: reset yaw, then perform small tank turn bursts until target reached.
+    Adjust sign if your robot turns the opposite way.
+    """
+    # Reset yaw to start from 0 for a relative turn.
+    if hasattr(motion_sensor, "reset_yaw"):
+        motion_sensor.reset_yaw(0)
+    target = _norm_angle(degrees)
+    # Decide turning direction; if your hub reports opposite sign, flip dir_sign.
+    while True:
+        current = get_yaw()
+        if current is None:
+            break  # Sensor not available; abort.
+        error = _norm_angle(target - current)
+        if abs(error) <= tolerance:
+            break
+        # Choose direction: positive error -> turn one way.
+        # Empirically you may need to invert. Start with this mapping:
+        dir = 1 if error > 0 else -1
+        # Short controlled burst: larger error -> more degrees.
+        burst_degrees = 40 if abs(error) > 30 else 20
+        # Tank turn: opposite motor velocities.
+        await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, burst_degrees * dir, speed * dir, -speed * dir)
+        await runloop.sleep_ms(30)  # brief pause lets sensor update
+    # Small brake / settle pause
+    await runloop.sleep_ms(100)
+
 async def main():
     print(
     """The position of the robot should be the right wheel should be just covering the second line from the right 
@@ -35,4 +87,6 @@ async def main():
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 50, 0, velocity=610)
     await motor.run_for_degrees(port.A, -80, 360) #relase
     #await motor.run_for_degrees(port.A, -147, 999999999) # Raise fork up to pick up the brush
+    # Example orientation adjustment: turn ~90 degrees at end
+    await turn_relative(90, speed=300, tolerance=3)
 runloop.run(main())
