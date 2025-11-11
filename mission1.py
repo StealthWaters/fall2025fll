@@ -6,6 +6,7 @@ motion_sensor.get_yaw_face
 print("part 1")
 
 # ---------------- Orientation Helpers ----------------
+# Defines normal angles that the robot should move
 def _norm_angle(angle):
     """Normalize angle to range [-180, 180]."""
     while angle > 180:
@@ -13,17 +14,13 @@ def _norm_angle(angle):
     while angle < -180:
         angle += 360
     return angle
-
+# Gets the current yaw angle
 def get_yaw():
     """Return current yaw angle if available (SPIKE Prime Hub)."""
-    if hasattr(motion_sensor, "get_yaw_angle"):
-        return motion_sensor.get_yaw_angle()
     if hasattr(motion_sensor, "get_yaw_face"):
         return motion_sensor.get_yaw_face()
-    if hasattr(motion_sensor, "get_yaw"):
-        return motion_sensor.get_yaw()
     return None
-
+#  The robot turns the desired angle based on the current yaw and changes to the desired yaw within your set tolerance.
 async def turn_relative(degrees, speed=300, tolerance=2):
     """Turn the robot by a relative yaw using the hub motion sensor.
 
@@ -53,40 +50,56 @@ async def turn_relative(degrees, speed=300, tolerance=2):
         burst_degrees = 40 if abs(error) > 30 else 20
         # Tank turn: opposite motor velocities.
         await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, burst_degrees * dir, speed * dir, -speed * dir)
-        await runloop.sleep_ms(30)  # brief pause lets sensor update
+        # brief pause lets sensor update
+        await runloop.sleep_ms(30)  
     # Small brake / settle pause
     await runloop.sleep_ms(100)
-
+#Main code
 async def main():
     print(
     """The position of the robot should be the right wheel should be just covering the second line from the right 
     of the mission start and the fork all the way back | Mission 1""")
     motion_sensor.reset_yaw(0)
     motor.reset_relative_position(port.A, 0)
-    await motor.run_for_degrees(port.A, 188, 360) # Move the fork down to the position
-    
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -610, 0, velocity=610) # Move the robot to the first mission
-   # if motion_sensor.get_yaw_face() > 0:
+    # Move the fork down to the position
+    await motor.run_for_degrees(port.A, 188, 360) 
+
+    # Move the robot to the first mission
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -610, 0, velocity=610) 
+    # if motion_sensor.get_yaw_face() > 0:
     print("thousand years of")
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 184, -250, 250) # Turn to face the first mission and sweep to the left
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -100, -250, 250) # Turn to sweep to the right
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 100, 0, velocity=200) # Back up to let the brush settle
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 30, -250, 250) # Turn to face the mission after sweeping
-    await runloop.sleep_ms(300) # Wait for the brush to stop moving
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -100, 0, velocity=125) # Thrust
-    await motor.run_for_degrees(port.A, -103, 360) # Raise the fork up to pick up the brush
+    # Turn to face the first mission and sweep to the left
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 184, -250, 250) 
+    # Turn to sweep to the right
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -100, -250, 250) 
+    # Back up to let the brush settle
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 100, 0, velocity=200) 
+    # Turn to face the mission after sweeping
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 30, -250, 250) 
+    # Wait for the brush to stop moving
+    await runloop.sleep_ms(300)
+    # Thrust
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -100, 0, velocity=125) 
+    # Raise the fork up to pick up the brush
+    await motor.run_for_degrees(port.A, -103, 360) 
     
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 200, 0, velocity=600)
-    await motor.run_for_degrees(port.A, 95, 160) # Raise the fork up to pick up the brush
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -550, 00, 500) # Turn to sweep to the right
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -300, 0, velocity=600) #do this cool turn to move out and face path to go to center
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -120, -500, 500) # turn to face colluseum next to fossil
+    # Lower the fork down to pick up the brush
+    await motor.run_for_degrees(port.A, 85, 160)
+    # Turn to sweep to the right
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -550, 00, 500)
+    #do this cool turn to move out and face path to go to center
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -300, 0, velocity=600)
+    # turn to face colluseum next to fossil
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -120, -500, 500)
     await runloop.sleep_ms(500) 
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -30, 0, velocity=610)
-    await motor.run_for_degrees(port.A, 80, 360) #relase
+    # release
+    await motor.run_for_degrees(port.A, 80, 360) 
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 50, 0, velocity=610)
-    await motor.run_for_degrees(port.A, -80, 360) #relase
-    #await motor.run_for_degrees(port.A, -147, 999999999) # Raise fork up to pick up the brush
+    # release
+    await motor.run_for_degrees(port.A, -80, 360) 
+    
     # Example orientation adjustment: turn ~90 degrees at end
     await turn_relative(90, speed=300, tolerance=3)
 runloop.run(main())
