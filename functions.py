@@ -46,4 +46,66 @@ async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, r
     
     motor.stop(port.C)
     motor.stop(port.E)
-# STRAIGHT LINE CODE END
+# PRECISE TURNING CODE (PTS)
+async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, correction_factor:float=0.1, tolerance=2):
+    """
+    Turning for given degree and direction.
+
+    Parameters
+    ----------
+    degree : int
+        decidegree for turning.
+        Positive range mean clockwise turning. (yaw will goes negative)
+        Negative range mean counter clockwise turning. (yaw will goes positive)
+        Turning angle should less than 180 degree, for both direction.
+        Range: -1800 to 1800
+    speed : int, optional
+        moving speed.
+        Default: 200
+    ref_yaw : int|None, optional
+        Target yaw. If not given, current yaw will use.
+        If 0 given, robot align to first position angle.
+        Default: None, current yaw
+    correction_factor : float, optional
+        Tunning parameter for amount of control.
+        Default:0.2
+    
+    Raises
+    ------
+    ValueError
+        If degree is not in range -1800to1800
+    """
+    if abs(degree) > 1800:
+        raise ValueError
+
+    if degree > 0:
+        turning_direction = -1
+    else:
+        turning_direction = 1
+
+    if ref_yaw == None:
+        ref_yaw = motion_sensor.tilt_angles()[0]
+
+    # Change from -180to180 to 0to360
+    ref_yaw = (ref_yaw - 3600) % 3600
+    target_yaw = (ref_yaw - degree) % 3600
+
+    while True:
+        angle_diff = abs(abs((motion_sensor.tilt_angles()[0] - 3600)%3600) - abs(target_yaw))
+
+        #motor.run(port.C, speed * turning_direction)
+        #motor.run(port.E, speed * turning_direction)
+        if angle_diff > 100:
+            motor.run(port.C, speed * turning_direction)
+            motor.run(port.E, speed * turning_direction)
+        else:
+            motor.run(port.C, int(speed * turning_direction * correction_factor))
+            motor.run(port.E, int(speed * turning_direction * correction_factor))
+
+        if angle_diff <= tolerance:
+            break
+
+        await runloop.sleep_ms(1)
+
+    motor.stop(port.C)
+    motor.stop(port.E)
