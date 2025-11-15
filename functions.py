@@ -1,4 +1,7 @@
 # STRAIGHT LINE CODE START (SLC) move_straight_for_time(4000) <-- Pres Ctrl+Left_Arrow twice to copy sample.
+import motor, time
+from hub import port, motor_pair
+motion_sensor.reset_yaw
 async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, reference_yaw:int|None=None, correction_speed:float=0.7):
     """
     Moves FRONT or BACK for specific TIME
@@ -34,11 +37,10 @@ async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, r
     while time.ticks_ms() < tick_until:
         current_yaw = motion_sensor.tilt_angles()[0]
         correction = int((reference_yaw - current_yaw) * correction_speed)
+        motor_speed = speed * direction - correction
 
-        left_speed, right_speed = (speed * direction - correction)*-1, speed * direction - correction
-
-        motor.run(port.C, left_speed)
-        motor.run(port.E, right_speed)
+        motor.run(port.C, motor_speed*-1)
+        motor.run(port.E, motor_speed)
 
         await runloop.sleep_ms(10)
     
