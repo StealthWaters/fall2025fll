@@ -109,3 +109,79 @@ async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, c
 
     motor.stop(port.C)
     motor.stop(port.E)
+    
+def cur_yaw_topview():
+    return motion_sensor.tilt_angles()[0] * -1
+
+def cur_yaw_in_3600():
+    return (cur_yaw_topview() + 3600) % 3600
+
+async def turning_for_degree_v2(degree:int, speed:int=200, ref_yaw:int|None=None, turning_direction:int=1, speed_reduce_angle_diff:int=100, speed_reduce_ratio:float=0.1, tolerance=2):
+    """
+    Turning for given degree and direction.
+
+    Parameters
+    ----------
+    degree : int
+        decidegree for turning.
+        Positive range mean clockwise turning. (yaw from tilt_angles() will goes negative)
+        Negative range mean counter clockwise turning. (yaw from tilt_angles() will goes positive)
+        Range: -3600 to 3600
+    speed : int, optional
+        moving speed.
+        Default: 200
+    ref_yaw : int|None, optional
+        If not given, current yaw will use.
+        If 0 given, robot align to first position angle when it power on.
+        Range: 0 to 3600
+        Default: None, current yaw
+    turning_direction : int, optional
+        Default turning direction. It will changed by degree value.
+        1 mean counter clockwise turning
+        -1 mean clockwise turning
+        Default: 1
+    speed_reduce_angle_diff : int, optional
+        Tuning parameter of speed reducing beginning angle diff to target yaw.
+        Default: 100
+    speed_reduce_ratio : float, optional
+        Tunning parameter of speed reducing ration near target yaw.
+        Default: 0.2
+    tolerance : int, optional
+        Stop condition tolerance of angle diff.
+        Default : 2
+
+    Raises
+    ------
+    ValueError
+        If degree is not in range -3600 to 3600
+    """
+    if abs(degree) > 3600:
+        raise ValueError
+
+    # Depends on motor position
+    if degree >= 0:
+        turning_direction *= -1
+    else:
+        turning_direction *= 1
+
+    if ref_yaw == None:
+        ref_yaw = cur_yaw_in_3600()
+
+    target_yaw = (ref_yaw + degree) % 3600
+
+    while True:
+        angle_diff = abs(target_yaw - cur_yaw_in_3600())
+
+        if angle_diff <= tolerance:
+            motor.stop(port.C)
+            motor.stop(port.E)
+            break
+
+        if angle_diff > speed_reduce_angle_diff:
+            motor.run(port.C, speed * turning_direction)
+            motor.run(port.E, speed * turning_direction)
+        else:
+            motor.run(port.C, int(speed * turning_direction * speed_reduce_ratio))
+            motor.run(port.E, int(speed * turning_direction * speed_reduce_ratio))
+
+        await runloop.sleep_ms(1)
