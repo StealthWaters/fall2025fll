@@ -318,7 +318,7 @@ async def main():
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -130, 0, velocity=670) # Move forward to mission 5
     await motor.run_for_degrees(port.A, -170, 367) # Move arm to do the mission
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 77, 0, velocity=670) # Back up a little
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 67, -100, 100) # Turn to get ready to go home
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 70, -100, 100) # Turn to get ready to go home
     await move_straight_for_time(1167, 850, -1, None, 1) # Move back to home
     motor.run_for_degrees(port.A, 165, 870) # Move arm to back position
     print("hi")
