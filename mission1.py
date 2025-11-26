@@ -1,105 +1,136 @@
+# CODE RELIES ON PORTS "C" AND "E"
 from hub import port, motion_sensor
-import runloop, motor, motor_pair
-motor_pair.pair(motor_pair.PAIR_1, port.E, port.C)
+import runloop, motor, time
+motor.reset_relative_position(port.A, 0)
 motion_sensor.reset_yaw
-motion_sensor.get_yaw_face
-print("part 1")
-
-# ---------------- Orientation Helpers ----------------
-# Defines normal angles that the robot should move
-def _norm_angle(angle):
-    """Normalize angle to range [-180, 180]."""
-    while angle > 180:
-        angle -= 360
-    while angle < -180:
-        angle += 360
-    return angle
-# Gets the current yaw angle
-def get_yaw():
-    """Return current yaw angle if available (SPIKE Prime Hub)."""
-    if hasattr(motion_sensor, "get_yaw_face"):
-        return motion_sensor.get_yaw_face()
-    return None
-#  The robot turns the desired angle based on the current yaw and changes to the desired yaw within your set tolerance.
-async def turn_relative(degrees, speed=300, tolerance=2):
-    """Turn the robot by a relative yaw using the hub motion sensor.
-
-    degrees: desired change in heading (+ clockwise or counter‑clockwise depending on hub convention).
-    speed: motor speed magnitude for tank turn.
-    tolerance: acceptable yaw error to stop.
-
-    Strategy: reset yaw, then perform small tank turn bursts until target reached.
-    Adjust sign if your robot turns the opposite way.
+#SIX
+#SEVEN
+# STRAIGHT LINE CODE START (SLC) move_straight_for_time(4000) <-- Pres Ctrl+Left_Arrow twice to copy sample.
+async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, reference_yaw:int|None=None, correction_speed:float=0.7):
     """
-    # Reset yaw to start from 0 for a relative turn.
-    if hasattr(motion_sensor, "reset_yaw"):
-        motion_sensor.reset_yaw(0)
-    target = _norm_angle(degrees)
-    # Decide turning direction; if your hub reports opposite sign, flip dir_sign.
-    while True:
-        current = get_yaw()
-        if current is None:
-            break  # Sensor not available; abort.
-        error = _norm_angle(target - current)
-        if abs(error) <= tolerance:
-            break
-        # Choose direction: positive error -> turn one way.
-        # Empirically you may need to invert. Start with this mapping:
-        dir = 1 if error > 0 else -1
-        # Short controlled burst: larger error -> more degrees.
-        burst_degrees = 40 if abs(error) > 30 else 20
-        # Tank turn: opposite motor velocities.
-        await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, burst_degrees * dir, speed * dir, -speed * dir)
-        # brief pause lets sensor update
-        await runloop.sleep_ms(30)  
-    # Small brake / settle pause
-    await runloop.sleep_ms(100)
-#Main code
-async def main():
-    print(
-    """The position of the robot should be the right wheel should be just covering the second line from the right 
-    of the mission start and the fork all the way back | Mission 1""")
-    motion_sensor.reset_yaw(0)
-    motor.reset_relative_position(port.A, 0)
-    # Move the fork down to the position
-    await motor.run_for_degrees(port.A, 188, 360) 
+    Moves FRONT or BACK for specific TIME
 
-    # Move the robot to the first mission
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -610, 0, velocity=610) 
-    # if motion_sensor.get_yaw_face() > 0:
-    print("thousand years of")
-    # Turn to face the first mission and sweep to the left
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 184, -250, 250) 
-    # Turn to sweep to the right
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -100, -250, 250) 
-    # Back up to let the brush settle
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 100, 0, velocity=200) 
-    # Turn to face the mission after sweeping
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 30, -250, 250) 
-    # Wait for the brush to stop moving
-    await runloop.sleep_ms(300)
-    # Thrust
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -100, 0, velocity=125) 
-    # Raise the fork up to pick up the brush
-    await motor.run_for_degrees(port.A, -103, 360) 
+    PARAMETERS
+    -
+
+    duration ( Integer ) --> REQUIRED 
+        Milisecond time for moving
+    speed ( Integer )
+        Default = 400
+    direction ( Integer )
+        Default = 1 [FORWARD]
+    reference_yaw ( Integer )
+        Default = None [Uses CURRENT]
+    correction_speed ( Float )
+        Default = 0.7
+
+        LOWER makes SLOW TURN, more prone to FALLING OFF PATH.
+
+        HIGHER makes FASTER but LESS ACCURATE correction.
+
+    await move_straight_for_time(1500)
+    -
+    ^ A 4 second sample movement code set to defaults
+    """
+
+    tick_until = time.ticks_ms() + duration
+
+    if reference_yaw == None:
+        reference_yaw = motion_sensor.tilt_angles()[0]
+
+    while time.ticks_ms() < tick_until:
+        current_yaw = motion_sensor.tilt_angles()[0]
+        correction = int((reference_yaw - current_yaw) * correction_speed)
+
+        left_speed, right_speed = (speed * direction - correction)*-1, speed * direction - correction
+
+        motor.run(port.C, left_speed)
+        motor.run(port.E, right_speed)
+
+        await runloop.sleep_ms(10)
     
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 200, 0, velocity=600)
-    # Lower the fork down to pick up the brush
-    await motor.run_for_degrees(port.A, 85, 160)
-    # Turn to sweep to the right
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -550, 00, 500)
-    #do this cool turn to move out and face path to go to center
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -300, 0, velocity=600)
-    # turn to face colluseum next to fossil
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -120, -500, 500)
-    await runloop.sleep_ms(500) 
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -30, 0, velocity=610)
-    # release
-    await motor.run_for_degrees(port.A, 80, 360) 
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 50, 0, velocity=610)
-    # release
-    await motor.run_for_degrees(port.A, -80, 360) 
-    
-    # Example orientation adjustment: turn ~90 degrees at end
-    await turn_relative(90, speed=300, tolerance=3)
+    motor.stop(port.C)
+    motor.stop(port.E)
+# Precise Turning Code (PTS)
+async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, correction_factor:float=0.1, tolerance=2):
+    """
+    Turning for given degree and direction.
+
+    Parameters
+    ----------
+    degree : int
+        decidegree for turning.
+        Positive range mean clockwise turning. (yaw will goes negative)
+        Negative range mean counter clockwise turning. (yaw will goes positive)
+        Turning angle should less than 180 degree, for both direction.
+        Range: -1800 to 1800
+    speed : int, optional
+        moving speed.
+        Default: 200
+    ref_yaw : int|None, optional
+        Target yaw. If not given, current yaw will use.
+        If 0 given, robot align to first position angle.
+        Default: None, current yaw
+    correction_factor : float, optional
+        Tunning parameter for amount of control.
+        Default:0.2
+
+    Raises
+    ------
+    ValueError
+        If degree is not in range -1800to1800
+    """
+    if abs(degree) > 1800:
+        raise ValueError
+
+    if degree > 0:
+        turning_direction = -1
+    else:
+        turning_direction = 1
+
+    if ref_yaw == None:
+        ref_yaw = motion_sensor.tilt_angles()[0]
+
+    # Change from -180to180 to 0to360
+    ref_yaw = (ref_yaw - 3600) % 3600
+    target_yaw = (ref_yaw - degree) % 3600
+
+    while True:
+        angle_diff = abs(abs((motion_sensor.tilt_angles()[0] - 3600)%3600) - abs(target_yaw))
+
+        #motor.run(port.C, speed * turning_direction)
+        #motor.run(port.E, speed * turning_direction)
+        if angle_diff > 100:
+            motor.run(port.C, speed * turning_direction)
+            motor.run(port.E, speed * turning_direction)
+        else:
+            motor.run(port.C, int(speed * turning_direction * correction_factor))
+            motor.run(port.E, int(speed * turning_direction * correction_factor))
+
+        if angle_diff <= tolerance:
+            break
+
+        await runloop.sleep_ms(1)
+
+    motor.stop(port.C)
+    motor.stop(port.E)
+async def main():
+    #-860 is exactly 90 degrees to the left with current code in turning_for_degree
+
+    await motor.run_for_degrees(port.A, 185, 360) #move arm DOWN
+    await move_straight_for_time(2100) #move forward
+    await turning_for_degree(-1290) # turn to shovel off half
+    await turning_for_degree(600) # turn to shovel off other half (sweep)
+    await runloop.sleep_ms(100) # wait
+    await move_straight_for_time(250, 400, -1) # back up
+    await runloop.sleep_ms(100) # wait
+    await turning_for_degree(-185) #align to face
+    await runloop.sleep_ms(500) # wait
+    await move_straight_for_time(375) # thrust
+    await runloop.sleep_ms(500)
+    await motor.run_for_degrees(port.A, -40, 360) #move arm UP
+    await move_straight_for_time(400, 400, -1) # back up carrying shovel
+    await turning_for_degree(-860) # face home
+    await move_straight_for_time(1300, 400, 1) # return
+
 runloop.run(main())
