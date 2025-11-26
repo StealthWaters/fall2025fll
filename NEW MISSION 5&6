@@ -15,6 +15,6 @@ async def main():
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 77, 0, velocity=670) # Back up a little
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 67, -97, 67) # Turn to get ready to go home
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 777, 0, velocity=999) # Move back to home
-    motor.run_for_degrees(port.A, 160, 870) # Move arm to start position
+    motor.run_for_degrees(port.A, 180, 870) # Move arm to start position
     print("hi")
 runloop.run(main())
