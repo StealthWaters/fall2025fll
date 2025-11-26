@@ -1,20 +1,20 @@
-
 from hub import port, motion_sensor
 import runloop, motor, motor_pair
 motor_pair.pair(motor_pair.PAIR_1, port.E, port.C)
 
 async def main():
+    await motor.run_for_degrees(port.A, -72, 870) # Move arm to start position
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -900, 0, velocity=999) # Move forward to mission 6
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 37, 67, -67) # Turn to face the mission
-    await motor.run_for_degrees(port.A, -167, 470) # Move arm to do the mission
+    await motor.run_for_degrees(port.A, -100, 470) # Move arm to do the mission
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 110, 0, velocity=670) # Back away
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -77, 200, -167) # Turn to face mission 5
-    await motor.run_for_degrees(port.A, 177, 670) # Move arm to start position
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -167, 0, velocity=670) # Move forward to mission 5
-    await motor.run_for_degrees(port.A, -167, 470) # Move arm to do the mission
+    await motor.run_for_degrees(port.A, 167, 670) # Move arm to start position
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -145, 0, velocity=670) # Move forward to mission 5
+    await motor.run_for_degrees(port.A, -170, 367) # Move arm to do the mission
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 77, 0, velocity=670) # Back up a little
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 67, -97, 67) # Turn to get ready to go home
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 777, 0, velocity=999) # Move back to home
-    motor.run_for_degrees(port.A, 180, 870) # Move arm to start position
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 55, -97, 67) # Turn to get ready to go home
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 795, 0, velocity=999) # Move back to home
+    motor.run_for_degrees(port.A, 165, 870) # Move arm to back position
     print("hi")
 runloop.run(main())
