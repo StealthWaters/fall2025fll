@@ -42,7 +42,7 @@ async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, r
         current_yaw = motion_sensor.tilt_angles()[0]
         correction = int((reference_yaw - current_yaw) * correction_speed)
 
-        left_speed, right_speed = (speed * direction - correction)*-1, speed * direction - correction
+        left_speed, right_speed = (speed * direction - correction)*-1, speed * direction + correction
 
         motor.run(port.C, left_speed)
         motor.run(port.E, right_speed)
@@ -117,7 +117,7 @@ async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, c
 async def main():
     #-860 is exactly 90 degrees to the left with current code in turning_for_degree
 
-    await motor.run_for_degrees(port.A, 185, 360) #move arm DOWN
+    await motor.run_for_degrees(port.A, -33, 360) #move arm DOWN
     await move_straight_for_time(2100) #move forward
     await turning_for_degree(-1290) # turn to shovel off half
     await turning_for_degree(600) # turn to shovel off other half (sweep)
