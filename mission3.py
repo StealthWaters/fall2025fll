@@ -42,7 +42,7 @@ async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, r
         current_yaw = motion_sensor.tilt_angles()[0]
         correction = int((reference_yaw - current_yaw) * correction_speed)
 
-        left_speed, right_speed = (speed * direction - correction)*-1, speed * direction - correction
+        left_speed, right_speed = (speed * direction - correction)*-1, speed * direction + correction
 
         motor.run(port.C, left_speed)
         motor.run(port.E, right_speed)
@@ -122,6 +122,8 @@ async def main():
     await runloop.sleep_ms(100)
     await motor.run_for_degrees(port.A, -62, 180) # lift up tracks
     await runloop.sleep_ms(2500) # wait while minecart gets sent across to enemy territory
+    await motor.run_for_degrees(port.A, 62, 180)
     await move_straight_for_time(2100, 400, -1)
 
 runloop.run(main())
+
