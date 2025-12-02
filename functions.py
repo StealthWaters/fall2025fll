@@ -1,7 +1,11 @@
-# STRAIGHT LINE CODE START (SLC) move_straight_for_time(4000) <-- Pres Ctrl+Left_Arrow twice to copy sample.
-import motor, time
-from hub import port, motor_pair
+# CODE RELIES ON PORTS "C" AND "E". Make sure to initalize yaw measurements at the top inside async functions.
+from hub import port, motion_sensor, sound
+import runloop, motor, time
+motor.reset_relative_position(port.A, 0)
 motion_sensor.reset_yaw
+#SIX
+#SEVEN
+# STRAIGHT LINE CODE START (SLC) move_straight_for_time(4000) <-- Pres Ctrl+Left_Arrow twice to copy sample.
 async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, reference_yaw:int|None=None, correction_speed:float=0.7):
     """
     Moves FRONT or BACK for specific TIME
@@ -37,16 +41,17 @@ async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, r
     while time.ticks_ms() < tick_until:
         current_yaw = motion_sensor.tilt_angles()[0]
         correction = int((reference_yaw - current_yaw) * correction_speed)
-        motor_speed = speed * direction - correction
 
-        motor.run(port.C, motor_speed*-1)
-        motor.run(port.E, motor_speed)
+        left_speed, right_speed = (speed * direction - correction)*-1, speed * direction + correction
+
+        motor.run(port.C, left_speed)
+        motor.run(port.E, right_speed)
 
         await runloop.sleep_ms(10)
     
     motor.stop(port.C)
     motor.stop(port.E)
-# PRECISE TURNING CODE (PTS)
+# Precise Turning Code (PTS)
 async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, correction_factor:float=0.1, tolerance=2):
     """
     Turning for given degree and direction.
@@ -69,7 +74,7 @@ async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, c
     correction_factor : float, optional
         Tunning parameter for amount of control.
         Default:0.2
-    
+
     Raises
     ------
     ValueError
@@ -109,79 +114,3 @@ async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, c
 
     motor.stop(port.C)
     motor.stop(port.E)
-    
-def cur_yaw_topview():
-    return motion_sensor.tilt_angles()[0] * -1
-
-def cur_yaw_in_3600():
-    return (cur_yaw_topview() + 3600) % 3600
-
-async def turning_for_degree_v2(degree:int, speed:int=200, ref_yaw:int|None=None, turning_direction:int=1, speed_reduce_angle_diff:int=100, speed_reduce_ratio:float=0.1, tolerance=2):
-    """
-    Turning for given degree and direction.
-
-    Parameters
-    ----------
-    degree : int
-        decidegree for turning.
-        Positive range mean clockwise turning. (yaw from tilt_angles() will goes negative)
-        Negative range mean counter clockwise turning. (yaw from tilt_angles() will goes positive)
-        Range: -3600 to 3600
-    speed : int, optional
-        moving speed.
-        Default: 200
-    ref_yaw : int|None, optional
-        If not given, current yaw will use.
-        If 0 given, robot align to first position angle when it power on.
-        Range: 0 to 3600
-        Default: None, current yaw
-    turning_direction : int, optional
-        Default turning direction. It will changed by degree value.
-        1 mean counter clockwise turning
-        -1 mean clockwise turning
-        Default: 1
-    speed_reduce_angle_diff : int, optional
-        Tuning parameter of speed reducing beginning angle diff to target yaw.
-        Default: 100
-    speed_reduce_ratio : float, optional
-        Tunning parameter of speed reducing ration near target yaw.
-        Default: 0.2
-    tolerance : int, optional
-        Stop condition tolerance of angle diff.
-        Default : 2
-
-    Raises
-    ------
-    ValueError
-        If degree is not in range -3600 to 3600
-    """
-    if abs(degree) > 3600:
-        raise ValueError
-
-    # Depends on motor position
-    if degree >= 0:
-        turning_direction *= -1
-    else:
-        turning_direction *= 1
-
-    if ref_yaw == None:
-        ref_yaw = cur_yaw_in_3600()
-
-    target_yaw = (ref_yaw + degree) % 3600
-
-    while True:
-        angle_diff = abs(target_yaw - cur_yaw_in_3600())
-
-        if angle_diff <= tolerance:
-            motor.stop(port.C)
-            motor.stop(port.E)
-            break
-
-        if angle_diff > speed_reduce_angle_diff:
-            motor.run(port.C, speed * turning_direction)
-            motor.run(port.E, speed * turning_direction)
-        else:
-            motor.run(port.C, int(speed * turning_direction * speed_reduce_ratio))
-            motor.run(port.E, int(speed * turning_direction * speed_reduce_ratio))
-
-        await runloop.sleep_ms(1)
