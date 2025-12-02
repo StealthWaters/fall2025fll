@@ -41,7 +41,7 @@ async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, r
         current_yaw = motion_sensor.tilt_angles()[0]
         correction = int((reference_yaw - current_yaw) * correction_speed)
 
-        left_speed, right_speed = (speed * direction - correction)*-1, speed * direction - correction
+        left_speed, right_speed = (speed * direction - correction)*-1, speed * direction + correction
 
         motor.run(port.C, left_speed)
         motor.run(port.E, right_speed)
@@ -127,6 +127,7 @@ async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, t
 
         await runloop.sleep_ms(1)
 async def main():
+    motion_sensor.reset_yaw
     # Move Robot Forward
     await move_straight_for_time(2225) # (Leaves home)
     # Bring down arm
