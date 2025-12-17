@@ -352,5 +352,7 @@ async def acode_to_move_percentage_wise(rotation_percentage:int=300, speed:int=3
 #🡇 𝗖𝗢𝗗𝗘 𝗦𝗧𝗔𝗥𝗧𝗦 𝗛𝗘𝗥𝗘 🡇
 async def main():
     #🡇 𝗧𝗬𝗣𝗘 𝗜𝗡 𝗛𝗘𝗥𝗘 🡇
-    print("start")
+    print("started")
+    
+    print("ended")
 runloop.run(main())
