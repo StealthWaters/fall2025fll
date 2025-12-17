@@ -152,21 +152,21 @@ async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, c
 
         angle_diff = abs(abs((motion_sensor.tilt_angles()[0] - 3600)%3600) - abs(target_yaw))
 
-        #motor.run(port.C, speed * turning_direction)
+        #motor.run(port.A, speed * turning_direction)
 
-        #motor.run(port.E, speed * turning_direction)
+        #motor.run(port.B, speed * turning_direction)
 
         if angle_diff > 100:
 
-            motor.run(port.C, speed * turning_direction)
+            motor.run(port.A, speed * turning_direction)
 
-            motor.run(port.E, speed * turning_direction)
+            motor.run(port.B, speed * turning_direction)
 
         else:
 
-            motor.run(port.C, int(speed * turning_direction * correction_factor))
+            motor.run(port.A, int(speed * turning_direction * correction_factor))
 
-            motor.run(port.E, int(speed * turning_direction * correction_factor))
+            motor.run(port.B, int(speed * turning_direction * correction_factor))
 
         if angle_diff <= tolerance:
 
@@ -174,9 +174,9 @@ async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, c
 
         await runloop.sleep_ms(1)
 
-    motor.stop(port.C)
+    motor.stop(port.A)
 
-    motor.stop(port.E)
+    motor.stop(port.B)
 
 async def turning_for_degree_v2(degree:int, speed:int=200, ref_yaw:int|None=None, turning_direction:int=1, speed_reduce_angle_diff:int=100, speed_reduce_ratio:float=0.1, tolerance=2):
 
@@ -278,23 +278,23 @@ async def turning_for_degree_v2(degree:int, speed:int=200, ref_yaw:int|None=None
 
         if angle_diff <= tolerance:
 
-            motor.stop(port.C)
+            motor.stop(port.A)
 
-            motor.stop(port.E)
+            motor.stop(port.B)
 
             break
 
         if angle_diff > speed_reduce_angle_diff:
 
-            motor.run(port.C, speed * turning_direction)
+            motor.run(port.A, speed * turning_direction)
 
-            motor.run(port.E, speed * turning_direction)
+            motor.run(port.B, speed * turning_direction)
 
         else:
 
-            motor.run(port.C, int(speed * turning_direction * speed_reduce_ratio))
+            motor.run(port.A, int(speed * turning_direction * speed_reduce_ratio))
 
-            motor.run(port.E, int(speed * turning_direction * speed_reduce_ratio))
+            motor.run(port.B, int(speed * turning_direction * speed_reduce_ratio))
 
         await runloop.sleep_ms(1)
 
