@@ -60,11 +60,10 @@ async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, r
 
     while time.ticks_ms() < tick_until:
         current_yaw = motion_sensor.tilt_angles()[0]
-        correction = int((reference_yaw - current_yaw) * correction_speed)
+        correction = int((reference_yaw - abs(current_yaw)) * correction_speed)
         motor_speed = speed * direction - correction
         motor.run(port.A, motor_speed*-1)
         motor.run(port.B, motor_speed)
-        print(motion_sensor.tilt_angles()[0])
         await runloop.sleep_ms(10)
     motor.stop(port.A)
     motor.stop(port.B)
@@ -184,7 +183,7 @@ async def turning_for_degree_v2(degree:int, speed:int=200, ref_yaw:int|None=None
 
     Turning for given degree and direction.
 
-    Parameters
+    PARAMETERS
 
     ----------
 
@@ -348,7 +347,7 @@ async def acode_to_move_percentage_wise(rotation_percentage:int=300, speed:int=3
     """
     motor.run_for_degrees(port.A, int(rotation_percentage*-1), speed)
     motor.run_for_degrees(port.B, int(rotation_percentage), speed)
-    
+
 #🡇 𝗖𝗢𝗗𝗘 𝗦𝗧𝗔𝗥𝗧𝗦 𝗛𝗘𝗥𝗘 🡇
 async def main():
     #🡇 𝗧𝗬𝗣𝗘 𝗜𝗡 𝗛𝗘𝗥𝗘 🡇
