@@ -272,10 +272,12 @@ async def turning_for_degree_v2(degree:int, speed:int=200, ref_yaw:int|None=None
     target_yaw = (ref_yaw + degree) % 3600
 
     while True:
-
-        angle_diff = abs(target_yaw - cur_yaw_in_3600())
-
-        if angle_diff <= tolerance:
+        if cur_yaw_in_3600() < 0:
+            angle_diff = abs(target_yaw) + cur_yaw_in_3600()
+        else:
+            angle_diff = abs(target_yaw) - cur_yaw_in_3600()
+        
+        if abs(angle_diff) <= tolerance:
 
             motor.stop(port.A)
 
@@ -283,18 +285,19 @@ async def turning_for_degree_v2(degree:int, speed:int=200, ref_yaw:int|None=None
 
             break
 
-        if angle_diff > speed_reduce_angle_diff:
-
+        if abs(angle_diff) > speed_reduce_angle_diff:
             motor.run(port.A, speed * turning_direction)
 
             motor.run(port.B, speed * turning_direction)
-
         else:
+            if angle_diff < 0:
+                motor.run(port.A, int(speed * turning_direction * speed_reduce_ratio))
 
-            motor.run(port.A, int(speed * turning_direction * speed_reduce_ratio))
+                motor.run(port.B, int(speed * turning_direction * speed_reduce_ratio))
+            else:
+                motor.run(port.A, -int(speed * turning_direction * speed_reduce_ratio))
 
-            motor.run(port.B, int(speed * turning_direction * speed_reduce_ratio))
-
+                motor.run(port.B, -int(speed * turning_direction * speed_reduce_ratio))
         await runloop.sleep_ms(1)
 
 async def move_straight_until_range(rangesensorrange:int, speed:int=400, direction:int=1, reference_yaw:int|None=None, correction_speed:float=0.7):
@@ -352,10 +355,16 @@ async def acode_to_move_percentage_wise(rotation_percentage:int=300, speed:int=3
 async def main():
     #🡇 𝗧𝗬𝗣𝗘 𝗜𝗡 𝗛𝗘𝗥𝗘 🡇
     print("started")
-    await motor.run_for_degrees(port.C, -48, 167)
-    await move_straight_for_time(1650, 550, 1, None, 0.4)
-    #await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 50, -70, 70)
-    await runloop.sleep_ms(300)
-    await motor.run_for_degrees(port.C, -60, 300)
+    #wip
+    await motor.run_to_absolute_position(port.C, 0, 200)
+    await move_straight_for_time(2425, 350, 1, None, 0.2)
+    await runloop.sleep_ms(450)
+    await motor.run_for_degrees(port.C, -185, 250)
+    await move_straight_for_time(210, 350, 1, None, 0.4)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -20, 200, -200)
+    await move_straight_for_time(210, 350, 1, None, 0.4)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -30, 200, -200)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 30, -200, 200)
+    await move_straight_for_time(2400, 400, -1)
     print("ended")
 runloop.run(main())
