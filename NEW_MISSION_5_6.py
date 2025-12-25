@@ -69,10 +69,9 @@ async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, r
     motor.stop(port.B)
 
 # PTS(Precise Turning Code)
-def cur_yaw_topview():
-    return motion_sensor.tilt_angles()[0] * -1
 def cur_yaw_in_3600():
-    return (cur_yaw_topview() + 3600) % 3600
+    return (motion_sensor.tilt_angles()[0] + 3600)  % 3600
+
 async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, correction_factor:float=0.1, tolerance=2):
 
     """
@@ -141,7 +140,7 @@ async def turning_for_degree(degree:int, speed:int=200, ref_yaw:int|None=None, c
 
         ref_yaw = motion_sensor.tilt_angles()[0]
 
-    # Change from -180to180 to 0to360
+    # Change from -1800to1800 to 0to3600
 
     ref_yaw = (ref_yaw - 3600) % 3600
 
@@ -276,7 +275,7 @@ async def turning_for_degree_v2(degree:int, speed:int=200, ref_yaw:int|None=None
             angle_diff = abs(target_yaw) + cur_yaw_in_3600()
         else:
             angle_diff = abs(target_yaw) - cur_yaw_in_3600()
-        
+
         if abs(angle_diff) <= tolerance:
 
             motor.stop(port.A)
@@ -300,6 +299,96 @@ async def turning_for_degree_v2(degree:int, speed:int=200, ref_yaw:int|None=None
                 motor.run(port.B, -int(speed * turning_direction * speed_reduce_ratio))
         await runloop.sleep_ms(1)
 
+def angle_error(target, current):
+    # signed shortest-path error: -1800 ~ +1800
+    return (target - current + 5400) % 3600 - 1800
+
+async def turning_for_degree_v3(degree:int, direction:int=-1, speed:int=200, reference_yaw:int|None=None, angle_diff_to_reduce_speed:int=100, speed_reduce_ratio:float=0.1, tolerance=20):
+    """
+
+    ═══════════════════
+
+    Turns for a set amount of degrees
+
+    PARAMETERS:
+    -
+
+    degree ( Integer ) --> REQUIRED
+        Turns this amount of degrees, use direction to change the turning direction instead of using negatives
+        in 10s, so a 90 degree turn would be 900
+
+    direction ( Integer )
+        Default = 1 
+        -1 is turning clockwise, 1 is turning counter-clockwise
+
+    speed ( Integer )
+        Default = 150 
+    
+    reference_yaw ( Integer )
+        Default = None 
+        None uses current yaw to turn, otherwise uses that as baseline yaw
+
+    angle_diff_to_reduce_speed ( Integer )
+        Default = 100
+        Angle difference to start reducing speed
+
+    speed_reduce_ratio ( Float )
+        Default = 0.1
+        Ratio at which to reduce the speed
+
+    tolerance ( Integer )
+        Default = 30
+        Gives a buffer amount to turn to, as the wheels aren't all accurate
+    
+    await turning_for_degree_v3(900)
+    sample code set to 90 degree clockwise turn, everything else defaulted
+
+    Raises
+
+    ------
+
+    ValueError
+
+        If degree is not in range 1 to 3599(aka 3600)
+    """
+
+    if degree >= 3600:
+        raise ValueError
+
+    if reference_yaw == None:
+        reference_yaw = cur_yaw_in_3600()
+
+    # calculate target yaw
+    if direction == 1:
+        target_yaw = (reference_yaw + degree) % 3600
+    else:
+        target_yaw = (reference_yaw - degree) % 3600
+
+    while True:
+        current_yaw = cur_yaw_in_3600()
+        error = angle_error(target_yaw, current_yaw)
+        print(cur_yaw_in_3600())
+        # stop if within tolerance
+        if abs(error) <= tolerance:
+            break
+
+        # slow down near target
+        turn_speed = speed
+        if abs(error) < angle_diff_to_reduce_speed:
+            turn_speed = int(speed * speed_reduce_ratio)
+
+        # motor direction from error sign
+        motor_speed_left = turn_speed if error > 0 else -turn_speed
+        motor_speed_right = motor_speed_left
+
+        # run motors
+        motor.run(port.A, motor_speed_left)
+        motor.run(port.B, motor_speed_right)
+
+    # stop motors
+    motor.stop(port.A)
+    motor.stop(port.B)
+    
 async def move_straight_until_range(rangesensorrange:int, speed:int=400, direction:int=1, reference_yaw:int|None=None, correction_speed:float=0.7):
     """
     Moves FRONT or BACK until distance sensor reaches a certain amount
@@ -355,16 +444,7 @@ async def acode_to_move_percentage_wise(rotation_percentage:int=300, speed:int=3
 async def main():
     #🡇 𝗧𝗬𝗣𝗘 𝗜𝗡 𝗛𝗘𝗥𝗘 🡇
     print("started")
-    #wip
-    await motor.run_to_absolute_position(port.C, 0, 200)
-    await move_straight_for_time(2425, 350, 1, None, 0.2)
-    await runloop.sleep_ms(450)
-    await motor.run_for_degrees(port.C, -185, 250)
-    await move_straight_for_time(210, 350, 1, None, 0.4)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -20, 200, -200)
-    await move_straight_for_time(210, 350, 1, None, 0.4)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -30, 200, -200)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 30, -200, 200)
-    await move_straight_for_time(2400, 400, -1)
+    motion_sensor.reset_yaw
+    await turning_for_degree_v3(900)
     print("ended")
 runloop.run(main())
