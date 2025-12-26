@@ -27,7 +27,7 @@ motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
 # move_straight_for_time(4000) <-- this moves forward for 4000ms(aka 4 sec) at speed 400(default) and with everything else default
 motion_sensor.reset_yaw
 
-async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, reference_yaw:int|None=None, correction_factor:float=0.7):
+async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, reference_yaw:int|None=None, correction_speed:float=0.7):
     """
     Moves FRONT or BACK for specific TIME
 
@@ -46,50 +46,37 @@ async def move_straight_for_time(duration:int, speed:int=400, direction:int=1, r
     reference_yaw ( Integer )
         Default = None [Uses CURRENT]
 
-    correction_factor ( Float )
+    correction_speed ( Float )
         Default = 0.7
-        LOWER makes slower correction, more prone to FALLING OFF PATH.
+        LOWER makes SLOW TURN, more prone to FALLING OFF PATH.
         HIGHER makes FASTER but LESS ACCURATE correction.
-    await move_straight_for_time(4000)
+    await move_straight_for_time(1500)
     -
     ^ A 4 second sample movement code set to defaults
     """
-    if reference_yaw is None:
+    tick_until = time.ticks_ms() + duration
+    if reference_yaw == None:
         reference_yaw = motion_sensor.tilt_angles()[0]
 
-    end_time = time.ticks_ms() + duration
-
-    while time.ticks_ms() < end_time:
+    while time.ticks_ms() < tick_until:
         current_yaw = motion_sensor.tilt_angles()[0]
-
-        # Error: positive if robot has turned clockwise from reference
-        error = current_yaw - reference_yaw
-
-        # Correction speed
-        correction = int(error * correction_factor)
-
-        # Motor speeds (adjust for your motor orientation)
-        motor_left = -speed - correction # left motor negative for forward
-        motor_right = speed - correction # right motor positive for forward
-
-        # Run motors
-        motor.run(port.A, motor_left)
-        motor.run(port.B, motor_right)
-
-        await runloop.sleep_ms(10)
-
+        correction = int((reference_yaw - abs(current_yaw)) * correction_speed)
+        motor_speed = speed * direction - correction
+        motor.run(port.A, motor_speed*-1)
+        motor.run(port.B, motor_speed)
     motor.stop(port.A)
     motor.stop(port.B)
+    await runloop.sleep_ms(10)
 
 # PTS(Precise Turning Code)
 def cur_yaw_in_3600():
-    return (motion_sensor.tilt_angles()[0] + 3600)  % 3600
+    return (motion_sensor.tilt_angles()[0] + 3600)% 3600
 
 def angle_error(target, current):
     # signed shortest-path error: -1800 ~ +1800
     return (target - current + 5400) % 3600 - 1800
 
-async def turning_for_degree_v3(degree:int, direction:int=-1, speed:int=200, reference_yaw:int|None=None, angle_diff_to_reduce_speed:int=100, speed_reduce_ratio:float=0.1, tolerance=20):
+async def turning_for_degree_v3(degree:int, direction:int=-1, speed:int=150, reference_yaw:int|None=None, angle_diff_to_reduce_speed:int=100, speed_reduce_ratio:float=0.1, tolerance=20):
     """
 
     ═══════════════════
@@ -104,14 +91,14 @@ async def turning_for_degree_v3(degree:int, direction:int=-1, speed:int=200, ref
         in 10s, so a 90 degree turn would be 900
 
     direction ( Integer )
-        Default = 1 
+        Default = -1
         -1 is turning clockwise, 1 is turning counter-clockwise
 
     speed ( Integer )
-        Default = 150 
-    
+        Default = 150
+
     reference_yaw ( Integer )
-        Default = None 
+        Default = None
         None uses current yaw to turn, otherwise uses that as baseline yaw
 
     angle_diff_to_reduce_speed ( Integer )
@@ -125,7 +112,7 @@ async def turning_for_degree_v3(degree:int, direction:int=-1, speed:int=200, ref
     tolerance ( Integer )
         Default = 30
         Gives a buffer amount to turn to, as the wheels aren't all accurate
-    
+
     await turning_for_degree_v3(900)
     sample code set to 90 degree clockwise turn, everything else defaulted
 
@@ -138,7 +125,7 @@ async def turning_for_degree_v3(degree:int, direction:int=-1, speed:int=200, ref
         If degree is not in range 1 to 3599(aka 3600)
     """
 
-    if degree >= 3600:
+    if degree >= 3600 or degree == 0:
         raise ValueError
 
     if reference_yaw == None:
@@ -174,7 +161,7 @@ async def turning_for_degree_v3(degree:int, direction:int=-1, speed:int=200, ref
     # stop motors
     motor.stop(port.A)
     motor.stop(port.B)
-    
+
 async def move_straight_until_range(rangesensorrange:int, speed:int=400, direction:int=1, reference_yaw:int|None=None, correction_speed:float=0.7):
     """
     Moves FRONT or BACK until distance sensor reaches a certain amount
@@ -230,6 +217,6 @@ async def acode_to_move_percentage_wise(rotation_percentage:int=300, speed:int=3
 async def main():
     #🡇 𝗧𝗬𝗣𝗘 𝗜𝗡 𝗛𝗘𝗥𝗘 🡇
     print("started")
-    
+    await move_straight_for_time(1000, 400, -1)
     print("ended")
 runloop.run(main())
