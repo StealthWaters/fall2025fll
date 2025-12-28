@@ -19,7 +19,7 @@
     ╚════════════════════════════╝
 ﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠ𝗕𝗔𝗖𝗞
 """
-from hub import port, motion_sensor
+from hub import port, motion_sensor, sound
 import runloop, motor, motor_pair, time, distance_sensor
 motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
 
@@ -218,19 +218,29 @@ async def main():
     #🡇 𝗧𝗬𝗣𝗘 𝗜𝗡 𝗛𝗘𝗥𝗘 🡇
     print("started")
     motion_sensor.reset_yaw
-    await motor.run_to_absolute_position(port.D, 340, 200)
-    await runloop.sleep_ms(100)
-    await move_straight_for_time(2295, 400, -1)
-    await motor.run_for_degrees(port.D, -135, 250)
-    await motor.run_to_absolute_position(port.D, 340, 200)
-    await runloop.sleep_ms(100)
-    await turning_for_degree_v3(30, 1)
-    await runloop.sleep_ms(250)
-    await move_straight_for_time(467, 400, -1)
-    await runloop.sleep_ms(250)
-    await turning_for_degree_v3(250, 1)
-    await runloop.sleep_ms(250)
-    await turning_for_degree_v3(250)
-    await move_straight_for_time(2670)
+    await motor.run_to_absolute_position(port.C, 265, 200)
+    await sound.beep(480, 500, 100)
+    await runloop.sleep_ms(300)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 920, 1, velocity=450)
+    await sound.beep(520, 500, 100)
+    await runloop.sleep_ms(350)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -35, 250, -250)
+    await sound.beep(560, 500, 100)
+    await runloop.sleep_ms(350)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 40, 1, velocity=450)
+    await runloop.sleep_ms(350)
+    await motor.run_for_degrees(port.C, -50, 200)
+    await sound.beep(600, 500, 100)
+    await runloop.sleep_ms(350)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -35, 250, -250)
+    await sound.beep(640, 500, 100)
+    await runloop.sleep_ms(350)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -950, 1, velocity=450)
+    await motor.run_to_absolute_position(port.C, 285, 200)
+    await sound.beep(400, 500, 100)
+    await sound.beep(440, 500, 100)
+    await sound.beep(480, 500, 100)
+    await sound.beep(520, 500, 100)
+    await sound.beep(560, 1000, 300)
     print("ended")
 runloop.run(main())
