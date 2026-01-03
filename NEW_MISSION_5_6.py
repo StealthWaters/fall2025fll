@@ -218,7 +218,7 @@ async def main():
     #🡇 𝗧𝗬𝗣𝗘 𝗜𝗡 𝗛𝗘𝗥𝗘 🡇
     print("started")
     motion_sensor.reset_yaw
-    
+
     await motor.run_to_absolute_position(port.C, 265, 200)
     await sound.beep(400, 500, 100)
     await runloop.sleep_ms(300)
@@ -231,7 +231,7 @@ async def main():
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 40, 1, velocity=450)
     await sound.beep(520, 500, 100)
     await runloop.sleep_ms(350)
-    await motor.run_for_degrees(port.C, -50, 180)
+    await motor.run_for_degrees(port.C, -55, 180)
     await sound.beep(560, 500, 100)
     await runloop.sleep_ms(350)
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -35, 250, -250)
@@ -251,27 +251,29 @@ async def main():
     await runloop.sleep_ms(350)
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -20, 300, -300)
     await runloop.sleep_ms(150)
-    await motor.run_for_degrees(port.D, -85, 200)
+    await motor.run_for_degrees(port.D, -90, 200)
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 30, 300, -300)
     await sound.beep(400, 500, 100)
     await runloop.sleep_ms(350)
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 30, 300, -300)
     await motor.run_for_degrees(port.D, 85, 200)
+    await sound.beep(400, 500, 100)
+    await runloop.sleep_ms(350)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -185, 1, velocity=400)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 100, 300, -300)
+    await motor.run_for_degrees(port.D, 70, 200)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 100, 300, -300)
+    """
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 250, 1)
     await sound.beep(400, 500, 100)
     await runloop.sleep_ms(350)
+    
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -100, 200, -200)
     await sound.beep(400, 500, 100)
     await runloop.sleep_ms(350)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 920, 1, velocity=400)
-    """
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -950, 1, velocity=450)
-    await motor.run_to_absolute_position(port.C, 285, 200)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 820, 1, velocity=400)
     await sound.beep(400, 500, 100)
-    await sound.beep(440, 500, 100)
-    await sound.beep(480, 500, 100)
-    await sound.beep(520, 500, 100)
-    await sound.beep(560, 1000, 300)
+    await runloop.sleep_ms(250)
     """
     print("ended")
 runloop.run(main())
