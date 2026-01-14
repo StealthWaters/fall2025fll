@@ -244,6 +244,9 @@ async def main():
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 180, 1, velocity=450)#move forwards, pulling the cart out in the process. The car will be latched onto the one way gate
     await runloop.sleep_ms(350)
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -135, 100, -200) #rotate to set up b4 going home
-    motor_pair.move_for_degrees(motor_pair.PAIR_1, 600, 1, velocity=450)#move homes
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 600, 1, velocity=450)#move homes
+    await runloop.sleep_ms(350)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -35, 100, -200) #rotate to set up b4 going home
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 600, 1, velocity=450)#move homes
     print("ended")
 runloop.run(main()) #2266
