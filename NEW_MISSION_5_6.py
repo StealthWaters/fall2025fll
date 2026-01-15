@@ -1,3 +1,4 @@
+
 """
 ﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠ𝗙𝗥𝗢𝗡𝗧
     ╔════════════════════════════╗
@@ -243,7 +244,7 @@ async def main():
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -100, 200, -200)
     await sound.beep(680, 500, 100)
     await runloop.sleep_ms(200)
-    await motor.run_to_absolute_position(port.C, 285, 200)
+    await motor.run_to_absolute_position(port.C, 285, 150)
     await sound.beep(720, 500, 100)
     await runloop.sleep_ms(350)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -335, 1, velocity=400)
@@ -267,7 +268,7 @@ async def main():
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 250, 1)
     await sound.beep(400, 500, 100)
     await runloop.sleep_ms(350)
-    
+
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -100, 200, -200)
     await sound.beep(400, 500, 100)
     await runloop.sleep_ms(350)
