@@ -1,6 +1,3 @@
-runloop.run(main())
-
-
 from hub import port
 import motor
 import motor_pair
