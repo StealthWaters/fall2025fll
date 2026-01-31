@@ -3,54 +3,68 @@ import runloop
 import motor_pair
 from hub import port
 from hub import sound
-motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+import distance_sensor
 
-motor.run_to_relative_position(port.C, 74, 167)
-runloop.sleep_ms(200)
+
+motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+Arm = motor.absolute_position(port.C)
+
+
+
+# This portion (12) breaks depending on where the motor is at. The following values work when it breaks: 44, 135, and 17.
+# Sometimes those don't work though...
+
+motor.run_to_relative_position(port.C, Arm, 167)
+
+#runloop.sleep_ms(200)
+
+# For putting the attachment in:
+# Put attachment arm at a 90 degree angle
+# Then, make sure the bevel gears are aligned to the black ticks
+# The arm should be slightly to the left
 
 
 async def main():
     #🡇 𝗧𝗬𝗣𝗘 𝗜𝗡 𝗛𝗘𝗥𝗘 🡇
     print("started")
-    
+    await motor.run_to_absolute_position(port.C, 139, 660) # Move arm to initial position 
+    runloop.sleep_ms(500) # Make sure arm doesn't disrupt robot 
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 650, 0, velocity=670) #Move towards mission 1
     await runloop.sleep_ms(500)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -150, -2, velocity=475) #Move backwards to push the shovel
     await runloop.sleep_ms(100)
     await motor.run_for_degrees(port.C, -40, 200) #Raise attachment
-    await runloop.sleep_ms(2000)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 70, 0, velocity=500) #Move forwards to pick up the shovel
-    await motor.run_for_degrees(port.C, 67, 670) #Put attachment down
-    await runloop.sleep_ms(200)
-    await motor.run_for_degrees(port.C, -100, 200) #Raise attachment
+    await runloop.sleep_ms(1000)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 60, 0, velocity=500) #Move forwards to pick up the shovel
+    await motor.run_for_degrees(port.C, 100, 20000) #Put attachment down
+    await runloop.sleep_ms(400)
+    await motor.run_for_degrees(port.C, -120, 200) #Raise attachment
     await sound.beep()
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -675, 0, velocity=670) #Move backwards to home
+    #await motor_pair.move_for_degrees(motor_pair.PAIR_1, -675, 3, velocity=670) #Move backwards to home
 
-
-    
-    
-    
-    
-    """
+    #Mission 2
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 25, 1000, -1000) # Turn to travel to next mission
     await runloop.sleep_ms(500)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 328, 0, velocity = 400) # Move to next mission
     await runloop.sleep_ms(1000)
-    """
-    #await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 125, 200, -200) #Turn so robot is backwards facing the mission
+
+
+
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 140, 200, -200) #Turn so robot is backwards facing the mission
+    await runloop.sleep_ms(1000)
+    print(distance_sensor.distance(port.F))
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 10, 0, velocity = 400) #Reverse
+
+    await motor.run_for_degrees(port.D, 220, 400) #Put stick down
     #await runloop.sleep_ms(1000)
-    #await motor_pair.move_for_degrees(motor_pair.PAIR_1, -20, 0, velocity = 400) #Reverse
-    #await motor.run_for_degrees(port.D, 220, 400) #Put stick down
+    await runloop.sleep_ms(1000)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -100, 0, velocity = 10000) #Reverse
     #await runloop.sleep_ms(1000)
-    ##await runloop.sleep_ms(1000)
-    #await motor_pair.move_for_degrees(motor_pair.PAIR_1, -100, 0, velocity = 10000) #Reverse
-    #await runloop.sleep_ms(1000)
-    #await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 100, 1000, -1000 )
-    #await motor.run_for_degrees(port.D, -220, 400) #Put stick up
-    
-    #await motor_pair.move_for_degrees(motor_pair.PAIR_1, 250, 0, velocity = 6700)
-    #await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 50,200, -200)
-    #await motor_pair.move_for_degrees(motor_pair.PAIR_1, 700, 0, velocity = 6700)
-    
-    print("ended")
+
+    await motor.run_for_degrees(port.D, -220, 400) #Put stick up
+
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 200, 0, velocity = 6700)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 75, 200, -200)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 800, 0, velocity = 6700)
+
 runloop.run(main())
