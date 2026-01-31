@@ -18,13 +18,17 @@ motor.run_to_relative_position(port.C, Arm, 167)
 
 #runloop.sleep_ms(200)
 
-
+# For putting the attachment in:
+# Put attachment arm at a 90 degree angle
+# Then, make sure the bevel gears are aligned to the black ticks
+# The arm should be slightly to the left
 
 
 async def main():
     #🡇 𝗧𝗬𝗣𝗘 𝗜𝗡 𝗛𝗘𝗥𝗘 🡇
     print("started")
-
+    await motor.run_to_absolute_position(port.C, 139, 660) # Move arm to initial position 
+    runloop.sleep_ms(500) # Make sure arm doesn't disrupt robot 
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 650, 0, velocity=670) #Move towards mission 1
     await runloop.sleep_ms(500)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -150, -2, velocity=475) #Move backwards to push the shovel
@@ -45,6 +49,26 @@ async def main():
     await runloop.sleep_ms(1000)
 
 
+
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 140, 200, -200) #Turn so robot is backwards facing the mission
+    await runloop.sleep_ms(1000)
+    print(distance_sensor.distance(port.F))
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 10, 0, velocity = 400) #Reverse
+
+    await motor.run_for_degrees(port.D, 220, 400) #Put stick down
+    #await runloop.sleep_ms(1000)
+    await runloop.sleep_ms(1000)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -100, 0, velocity = 10000) #Reverse
+    #await runloop.sleep_ms(1000)
+
+    await motor.run_for_degrees(port.D, -220, 400) #Put stick up
+
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 200, 0, velocity = 6700)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 75, 200, -200)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 800, 0, velocity = 6700)
+
+
+    #Mission 2:
 
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 125, 200, -200) #Turn so robot is backwards facing the mission
     await runloop.sleep_ms(1000)
