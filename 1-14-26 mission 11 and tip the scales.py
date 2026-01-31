@@ -243,8 +243,11 @@ async def main():
     await runloop.sleep_ms(250)
     #return
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -190, 100, -200) #rotate to set up b4 going home
-    motor_pair.move(motor_pair.PAIR_1, 1, velocity=600)
-    while distance_sensor.distance(port.F) > 125:
+
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 955, 1, velocity=450) # move homes
+    motor_pair.move(motor_pair.PAIR_1, 1, velocity=450)
+
+    while distance_sensor.distance(port.F) > 50:
         continue
     motor_pair.stop(motor_pair.PAIR_1)
     print("Finish")
