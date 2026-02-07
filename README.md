@@ -1,12 +1,14 @@
+# How we performed
+
+This code achieved Regionals in Maryland Robo Rumble.
+
 # fall2025fll
 
 This is the entire repository of all the 2025 FLL Fall Season things. The schedule and workbook is in the excel sheet. Communicate in our Teams.
 
 # How to compile all code:
 
-Run Mission12.py
-Run Mission1.py or Mission2.py
-[Add More]
+Copy/Paste the code into Spike
 
 # How to use Github
 
