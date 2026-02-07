@@ -1,7 +1,6 @@
 # How we performed
 
-This code achieved Regionals in Maryland Robo Rumble.
-We scored: 310 Points
+This code achieved Regionals. We scored: 310 Points
 
 # fall2025fll
 
