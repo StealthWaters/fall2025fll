@@ -27,8 +27,9 @@ motor.run_to_relative_position(port.C, Arm, 167)
 async def main():
     #🡇 𝗧𝗬𝗣𝗘 𝗜𝗡 𝗛𝗘𝗥𝗘 🡇
     print("started")
-    await motor.run_to_absolute_position(port.C, 145, 660) # Move arm to initial position 
-    runloop.sleep_ms(500) # Make sure arm doesn't disrupt robot 
+    await motor.run_to_absolute_position(port.C, 145, 660) # Move arm to initial position
+
+    runloop.sleep_ms(250) # Make sure arm doesn't disrupt robot
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 650, 0, velocity=670) #Move towards mission 1
     await runloop.sleep_ms(500)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -150, -2, velocity=475) #Move backwards to push the shovel
@@ -44,21 +45,20 @@ async def main():
 
     #Mission 2
 
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 25, 1000, -1000) # Turn to travel to next mission
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 35, 1000, -1000) # Turn to travel to next mission
     await runloop.sleep_ms(500)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 328, 0, velocity = 400) # Move to next mission
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 330, 0, velocity = 400) # Move to next mission
     await runloop.sleep_ms(1000)
 
 
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 145, 200, -200) #Turn so robot is backwards facing the mission
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 103, 200, -200) #Turn so robot is backwards facing the mission
     await runloop.sleep_ms(1000)
     print(distance_sensor.distance(port.F))
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 10, 0, velocity = 400) #Reverse
-
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -50, 0, velocity = 400) #Reverse
     await motor.run_for_degrees(port.D, 220, 400) #Put stick down
-    #await runloop.sleep_ms(1000)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -75, 0, velocity = 400) #Reverse
     await runloop.sleep_ms(1000)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -100, 0, velocity = 10000) #Reverse
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -103, 0, velocity = 10000) #Reverse
     #await runloop.sleep_ms(1000)
 
     await motor.run_for_degrees(port.D, -220, 400) #Put stick up
