@@ -1,1 +1,81 @@
 This is owned by Noah and he will use and and and and and and and and and and and and and 
+import runloopmotor_pair.pair(motor_pair.PAIR_1, port.A, port.B)async def main():    # write your code here    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 1005, 0, velocity=500) # Move straight to mission    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 92, 200, -200) # Turn to mission# Put flag down here    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 280, 0, velocity=400) # Move to mission    await motor.run_for_degrees(port.C, -200, 300) # Raise minecart# await motor_pair.move_for_degrees(motor_pair.PAIR_1, 400, 0, velocity=400) # Stop to put down the flag    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 1000, 0, velocity=6700) # Move towards home    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 80, 200, -200) # Turn to home (blue)    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 815, 0, velocity=6700) # Move straight to home    runloop.run(main())
+from hub import port
+import motor
+import motor_pair
+import runloop
+
+
+motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+
+
+async def main():
+
+move_for_degrees(pair: int, degrees: int, steering: int, *, velocity: int = 360, stop: int = motor.BRAKE, acceleration: int = 1000, deceleration: int = 1000) -> Awaitable
+
+Move a Motor Pair at a constant speed for a specific number of degrees.
+When awaited returns a status of the movement that corresponds to one of the following constants from the motor module:
+
+motor.READY
+motor.RUNNING
+motor.STALLED
+motor.CANCELED
+motor.ERROR
+motor.DISCONNECTED
+
+
+from hub import port
+import runloop
+import motor_pair
+
+async def main():
+    # Pair motors on port A and B 
+    motor_pair.pair(motor_pair.PAIR_1, port.A, port.B)
+
+    # Move straight at default velocity for 90 degrees 
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 90, 0)
+
+    # Move straight at a specific velocity 
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 360, 0, velocity=280)
+
+    # Move straight at a specific velocity with a slow deceleration 
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 360, 0, velocity=280, deceleration=10)
+
+runloop.run(main())
+Parameters
+pair: int
+The pair slot of the Motor Pair.
+
+degrees: int
+The number of degrees
+
+steering: int
+The steering (-100 to 100)
+
+Optional keyword arguments:
+velocity: int
+The velocity in degrees/sec
+
+Value ranges depends on motor type.
+
+Small motor (essential): -660 to 660
+Medium motor: -1110 to 1110
+Large motor: -1050 to 1050
+
+stop: int
+The behavior of the Motor after it has stopped. Use the constants in the motor module.
+
+Possible values are
+motor.COAST to make the motor coast until a stop
+motor.BRAKE to brake and continue to brake after stop
+motor.HOLD to tell the motor to hold it's position
+motor.CONTINUE to tell the motor to keep running at whatever velocity it's running at until it gets another command
+motor.SMART_COAST to make the motor brake until stop and then coast and compensate for inaccuracies in the next command
+motor.SMART_BRAKE to make the motor brake and continue to brake after stop and compensate for inaccuracies in the next command
+
+acceleration: int
+The acceleration (deg/sec²) (1 - 10000)
+
+deceleration: int
+The deceleration (deg/sec²) (1 - 10000)
+
