@@ -14,22 +14,29 @@ async def main():
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 1005, 0, velocity=500) # Move straight to mission
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 92, 200, -200) # Turn to mission
     # Put flag down here
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 280, 0, velocity=400) #
-    await motor.run_for_degrees(port.D, 67, 300) #
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 282, 0, velocity=400) #
+    await motor.run_for_degrees(port.D, 75, 300) #
     await motor.run_for_degrees(port.C, -200, 300) #
 
-    await motor.run_for_degrees(port.D, -67, 300) #
+    await motor.run_for_degrees(port.D, -75, 300) #
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 255, 0, velocity=6700) # Move straight to mission
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -40, 100, -100)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 367, 0, velocity=6700) # Move straight to mission
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 35, 100, -100)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 260, 0, velocity=6700) # Move straight to mission
-    await motor.run_for_degrees(port.D, -70, 300) #
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 50, 100, -100)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 400, 0, velocity=6700) # Move straight to mission
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 356, 0, velocity=6700) # Move straight to mission
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 41, 100, -100)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 255, 0, velocity=6700) # Move straight to mission
+    await motor.run_for_degrees(port.D, -73, 300) #
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 48, 100, -100)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 670, 0, velocity=500) # Move straight to mission
+    await runloop.sleep_ms(350)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -200, 0, velocity=4000) # Move straight to mission
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -45, 100, -100)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 300, 0, velocity=2000) # Move straight to mission
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 55, 100, -100)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 1000, 0, velocity=2000) # Move straight to mission
+
 
     """
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 80, 200, -200)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 815, 0, velocity=6700) # Move straight to home
     """
-runloop.run(main())
+runloop.run(main()) 
