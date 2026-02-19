@@ -36,7 +36,7 @@ async def main():
     await runloop.sleep_ms(100)
     await motor.run_for_degrees(port.C, -40, 200) #Raise attachment
     await runloop.sleep_ms(1000)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 60, 0, velocity=500) #Move forwards to pick up the shovel
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 47, 0, velocity=500) #Move forwards to pick up the shovel
     await motor.run_for_degrees(port.C, 100, 20000) #Put attachment down
     await runloop.sleep_ms(400)
     await motor.run_for_degrees(port.C, -120, 200) #Raise attachment
@@ -51,13 +51,12 @@ async def main():
     await runloop.sleep_ms(1000)
 
 
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 103, 200, -200) #Turn so robot is backwards facing the mission
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 113, 200, -200) #Turn so robot is backwards facing the mission
     await runloop.sleep_ms(1000)
     print(distance_sensor.distance(port.F))
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -50, 0, velocity = 400) #Reverse
     await motor.run_for_degrees(port.D, 220, 400) #Put stick down
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -75, 0, velocity = 400) #Reverse
-    await runloop.sleep_ms(1000)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -103, 0, velocity = 10000) #Reverse
     #await runloop.sleep_ms(1000)
 
