@@ -1,4 +1,4 @@
-""
+"""
 ﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠ𝗙𝗥𝗢𝗡𝗧
     ╔════════════════════════════╗
     ║                            ║
@@ -268,7 +268,7 @@ async def main():
     await runloop.sleep_ms(300)
     await motor.run_for_degrees(port.D, -200, 400)
     await runloop.sleep_ms(200)
-   
+
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -155, 0, velocity=425) #Move towards the mission
     await runloop.sleep_ms(200)
     await turning_for_degree_v3(1350, 1, 200)
@@ -282,3 +282,4 @@ async def main():
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -200, 0, velocity=1000) #go back
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -40, 150, -150) #go back
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -600, 0, velocity=670) #go back
+runloop.run(main())
