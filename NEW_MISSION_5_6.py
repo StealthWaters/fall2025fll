@@ -236,7 +236,7 @@ async def main():
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -110, 1)
     await sound.beep(640, 500, 100)
     await runloop.sleep_ms(150)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -95, 200, -200)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -97, 200, -200)
     await motor.run_to_absolute_position(port.C, 285, 150)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -345, 1, velocity=400)
     await sound.beep(760, 500, 100)
