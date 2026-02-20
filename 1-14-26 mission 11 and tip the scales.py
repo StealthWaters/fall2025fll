@@ -233,7 +233,7 @@ async def main():
     await sound.beep(560, 500, 100)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -100, 1, velocity=450)
     await runloop.sleep_ms(250)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 29, 100, -100) #Rotate into a position where it is ready to complete tipping the scales
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 28, 100, -100) #Rotate into a position where it is ready to complete tipping the scales
     await runloop.sleep_ms(250)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -185, 1, velocity=450)#move backwards, to set up for one way door
     await runloop.sleep_ms(250)
