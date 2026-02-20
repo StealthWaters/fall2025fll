@@ -220,27 +220,27 @@ async def main():
     motion_sensor.reset_yaw
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 955, 1, velocity=450)
     await sound.beep(400, 500, 100)
-    await runloop.sleep_ms(250)
+    await runloop.sleep_ms(100)
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -105, 100, -100)
     await sound.beep(440, 500, 100)
-    await runloop.sleep_ms(250)
+    await runloop.sleep_ms(100)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 95, 1)
     await sound.beep(480, 500, 100)
-    await runloop.sleep_ms(250)
+    await runloop.sleep_ms(100)
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -20, 100, -100)
     await sound.beep(520, 500, 100)
     await motor.run_for_degrees(port.C, 2100, 1200)
     await sound.beep(560, 500, 100)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -100, 1, velocity=450)
-    await runloop.sleep_ms(250)
+    await runloop.sleep_ms(100)
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 28, 100, -100) #Rotate into a position where it is ready to complete tipping the scales
-    await runloop.sleep_ms(250)
+    await runloop.sleep_ms(100)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -185, 1, velocity=450)#move backwards, to set up for one way door
-    await runloop.sleep_ms(250)
+    await runloop.sleep_ms(100)
     await motor.run_for_degrees(port.D, 180, 750) # tip the scales
     await motor.run_for_degrees(port.D, -175, 600) #retract the arm back to og position so it doesn't get in the way
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 180, 1, velocity=450)#move forwards, pulling the cart out in the process. The car will be latched onto the one way gate
-    await runloop.sleep_ms(250)
+    await runloop.sleep_ms(100)
     #return
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -160, 100, -200) #rotate to set up b4 going home
 
