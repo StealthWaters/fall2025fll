@@ -271,7 +271,7 @@ async def main():
 
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -155, 0, velocity=425) #Move towards the mission
     await runloop.sleep_ms(200)
-    await turning_for_degree_v3(1340, 1, 200)
+    await turning_for_degree_v3(1345, 1, 200)
     await runloop.sleep_ms(600)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 300, 0, velocity=500) #push mission
     await runloop.sleep_ms(300)
