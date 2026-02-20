@@ -46,13 +46,13 @@ async def main():
     #Mission 2
 
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 35, 1000, -1000) # Turn to travel to next mission
-    await runloop.sleep_ms(500)
+    await runloop.sleep_ms(250)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 330, 0, velocity = 400) # Move to next mission
-    await runloop.sleep_ms(1000)
+    await runloop.sleep_ms(300)
 
 
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 113, 200, -200) #Turn so robot is backwards facing the mission
-    await runloop.sleep_ms(1000)
+    await runloop.sleep_ms(300)
     print(distance_sensor.distance(port.F))
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -50, 0, velocity = 400) #Reverse
     await motor.run_for_degrees(port.D, 220, 400) #Put stick down
