@@ -260,21 +260,21 @@ async def acode_to_move_percentage_wise(rotation_percentage:int=300, speed:int=3
 
 async def main():
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -405, 0, velocity=467) #Move towards the mission
-    await runloop.sleep_ms(300)
+    await runloop.sleep_ms(250)
     await motor.run_for_degrees(port.D, 215, 400)
-    await runloop.sleep_ms(300)
+    await runloop.sleep_ms(250)
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, 85, 0, velocity=500) #Move away from the mission
     await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -43, 400, -400)
-    await runloop.sleep_ms(300)
+    await runloop.sleep_ms(250)
     await motor.run_for_degrees(port.D, -200, 400)
     await runloop.sleep_ms(200)
 
     await motor_pair.move_for_degrees(motor_pair.PAIR_1, -155, 0, velocity=425) #Move towards the mission
     await runloop.sleep_ms(200)
     await turning_for_degree_v3(1345, 1, 200)
-    await runloop.sleep_ms(600)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 300, 0, velocity=500) #push mission
     await runloop.sleep_ms(300)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 300, 0, velocity=500) #push mission
+    await runloop.sleep_ms(250)
     await motor.run_for_degrees(port.C, -150, 400)
 
 
