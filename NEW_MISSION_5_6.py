@@ -1,4 +1,3 @@
-
 """
 ﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠﾠ𝗙𝗥𝗢𝗡𝗧
     ╔════════════════════════════╗
@@ -219,50 +218,37 @@ async def main():
     #🡇 𝗧𝗬𝗣𝗘 𝗜𝗡 𝗛𝗘𝗥𝗘 🡇
     print("started")
     motion_sensor.reset_yaw
-
-    await motor.run_to_absolute_position(port.C, 265, 200)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 920, 1, velocity=450)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 955, 1, velocity=450)
+    await sound.beep(400, 500, 100)
+    await runloop.sleep_ms(100)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -105, 100, -100)
     await sound.beep(440, 500, 100)
-    await runloop.sleep_ms(250)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -35, 250, -250)
+    await runloop.sleep_ms(100)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 95, 1)
     await sound.beep(480, 500, 100)
-    await runloop.sleep_ms(250)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 40, 1, velocity=450)
+    await runloop.sleep_ms(100)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -20, 100, -100)
     await sound.beep(520, 500, 100)
-    await runloop.sleep_ms(250)
-    await motor.run_for_degrees(port.C, -55, 180)
-    await sound.beep(600, 500, 100)
-    await runloop.sleep_ms(250)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -110, 1)
-    await sound.beep(640, 500, 100)
-    await runloop.sleep_ms(250)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -94, 200, -200)
-    await motor.run_to_absolute_position(port.C, 285, 150)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -340, 1, velocity=400)
-    await sound.beep(760, 500, 100)
-    await runloop.sleep_ms(200)
-    await motor.run_for_degrees(port.D, -120, 150)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 30, 300, -300)
-    await sound.beep(400, 500, 100)
-    await runloop.sleep_ms(200)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 30, 300, -300)
-    await motor.run_for_degrees(port.D, 85, 200)
-    await sound.beep(400, 500, 100)
-    await runloop.sleep_ms(200)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -185, 1, velocity=400)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 100, 300, -300)
-    await motor.run_for_degrees(port.D, 90, 200)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 100, 300, -300)
-    print("ended")
-    return
+    await motor.run_for_degrees(port.C, 2100, 1200)
+    await sound.beep(560, 500, 100)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -100, 1, velocity=450)
+    await runloop.sleep_ms(100)
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, 28, 100, -100) #Rotate into a position where it is ready to complete tipping the scales
+    await runloop.sleep_ms(100)
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, -185, 1, velocity=450)#move backwards, to set up for one way door
+    await runloop.sleep_ms(100)
+    await motor.run_for_degrees(port.D, 180, 750) # tip the scales
+    await motor.run_for_degrees(port.D, -175, 600) #retract the arm back to og position so it doesn't get in the way
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 180, 1, velocity=450)#move forwards, pulling the cart out in the process. The car will be latched onto the one way gate
+    await runloop.sleep_ms(100)
+    #return
+    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -160, 100, -200) #rotate to set up b4 going home
 
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 250, 1)
-    await sound.beep(400, 500, 100)
-    await runloop.sleep_ms(350)
-    await motor_pair.move_tank_for_degrees(motor_pair.PAIR_1, -100, 200, -200)
-    await sound.beep(400, 500, 100)
-    await runloop.sleep_ms(350)
-    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 820, 1, velocity=400)
-    await sound.beep(400, 500, 100)
-    await runloop.sleep_ms(250)
-runloop.run(main())
+    await motor_pair.move_for_degrees(motor_pair.PAIR_1, 955, 1, velocity=670) # move homes
+    motor_pair.move(motor_pair.PAIR_1, 1, velocity=450)
+
+    while distance_sensor.distance(port.F) > 50:
+        continue
+    motor_pair.stop(motor_pair.PAIR_1)
+    print("Finish")
+runloop.run(main()) #2266
