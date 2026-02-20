@@ -40,7 +40,7 @@ async def main():
     await motor.run_for_degrees(port.C, 100, 20000) #Put attachment down
     await runloop.sleep_ms(400)
     await motor.run_for_degrees(port.C, -120, 200) #Raise attachment
-    await sound.beep()
+    #await sound.beep()
     #await motor_pair.move_for_degrees(motor_pair.PAIR_1, -675, 3, velocity=670) #Move backwards to home
 
     #Mission 2
